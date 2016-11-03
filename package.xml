@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>rviz_interactive_tf</name>
+  <version>0.0.1</version>
+  <description>Manipulate a tf with an interactive marker</description>
+
+  <maintainer email="wsacul@gmail.com">Lucas Walter</maintainer>
+  <license>BSD</license>
+  <url type="website">http://github.com/lucasw/rviz_interactive_tf</url>
+
+  <author>Lucas Walter</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>interactive_markers</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>tf</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>interactive_markers</run_depend>
+  <run_depend>visualization_msgs</run_depend>
+  <run_depend>tf</run_depend>
+
+</package>
