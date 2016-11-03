@@ -15,10 +15,14 @@ void testFeedback(
 {}
 class InteractiveTf
 {
+  ros::NodeHandle nh_;
   boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
 
   void processFeedback(unsigned ind, const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
   visualization_msgs::InteractiveMarker int_marker_;
+
+  void updateTf(int, const ros::TimerEvent& event);
+  ros::Timer tf_timer_;
 public:
   InteractiveTf();
   ~InteractiveTf();
@@ -28,6 +32,7 @@ InteractiveTf::InteractiveTf()
 {
   server_.reset(new interactive_markers::InteractiveMarkerServer("interactive_tf"));
 
+  {
   visualization_msgs::InteractiveMarkerControl control;
 
   int_marker_.header.frame_id = "map";
@@ -48,8 +53,10 @@ InteractiveTf::InteractiveTf()
   control.always_visible = true;
   control.markers.push_back(box_marker);
   int_marker_.controls.push_back(control);
+  }
 
-  control.always_visible = true;
+  {
+  visualization_msgs::InteractiveMarkerControl control;
 
 	control.orientation.w = 1;
 	control.orientation.x = 1;
@@ -83,6 +90,7 @@ InteractiveTf::InteractiveTf()
 	control.name = "move_y";
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 	int_marker_.controls.push_back(control);
+  }
 
 	server_->insert(int_marker_);
   // Can't seem to get rid of the 0, _1 parameter
@@ -91,11 +99,19 @@ InteractiveTf::InteractiveTf()
 	// server_->setCallback(int_marker_.name, testFeedback);
 
   server_->applyChanges();
+
+  tf_timer_ = nh_.createTimer(ros::Duration(0.1),
+      boost::bind(&InteractiveTf::updateTf, this, 0, _1));
 }
 
 InteractiveTf::~InteractiveTf()
 {
   server_.reset();
+}
+
+void InteractiveTf::updateTf(int, const ros::TimerEvent& event)
+{
+
 }
 
 void InteractiveTf::processFeedback(
