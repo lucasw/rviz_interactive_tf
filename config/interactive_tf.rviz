@@ -6,7 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /InteractiveMarkers1
+        - /itf11
+        - /itf21
         - /TF1
       Splitter Ratio: 0.5
     Tree Height: 540
@@ -53,20 +54,31 @@ Visualization Manager:
     - Class: rviz/InteractiveMarkers
       Enable Transparency: true
       Enabled: true
-      Name: InteractiveMarkers
+      Name: itf1
       Show Axes: false
       Show Descriptions: false
       Show Visual Aids: false
-      Update Topic: /interactive_tf/update
+      Update Topic: /itf1/interactive_tf/update
       Value: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: false
+      Name: itf2
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /itf2/interactive_tf/update
+      Value: false
     - Class: rviz/TF
       Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        interactive_tf:
-          Value: true
         map:
+          Value: true
+        tf1:
+          Value: true
+        tf2:
           Value: true
       Marker Scale: 2
       Name: TF
@@ -75,8 +87,9 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
-          interactive_tf:
-            {}
+          tf1:
+            tf2:
+              {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -103,22 +116,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 4.50157881
+      Distance: 3.62090278
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.0968863964
-        Y: -0.508475184
+        X: 0.356687605
+        Y: 0.203398108
         Z: 1.1920929e-07
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.325398445
+      Pitch: 0.450398326
       Target Frame: <Fixed Frame>
       Value: XYOrbit (rviz)
-      Yaw: 1.94539511
+      Yaw: 0.345389485
     Saved: ~
 Window Geometry:
   Displays:
@@ -136,5 +149,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1200
-  X: 59
-  Y: 32
+  X: 58
+  Y: 24

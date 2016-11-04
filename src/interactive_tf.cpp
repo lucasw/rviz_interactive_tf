@@ -41,32 +41,16 @@ InteractiveTf::InteractiveTf() :
   frame_("interactive_tf")
 {
   server_.reset(new interactive_markers::InteractiveMarkerServer("interactive_tf"));
-
-  {
-  visualization_msgs::InteractiveMarkerControl control;
+  pose_.orientation.w = 1.0;
 
   ros::param::get("~parent_frame", parent_frame_);
-  int_marker_.header.frame_id = parent_frame_;
   ros::param::get("~frame", frame_);
+
+  int_marker_.header.frame_id = parent_frame_;
   int_marker_.header.stamp = ros::Time::now();
 	int_marker_.name = "interactive_tf";
 	int_marker_.description = "control a tf with 6dof";
-
-  visualization_msgs::Marker box_marker;
-  box_marker.type = visualization_msgs::Marker::CUBE;
-  box_marker.scale.x = 0.45;
-  box_marker.scale.y = 0.45;
-  box_marker.scale.z = 0.45;
-  box_marker.color.r = 0.5;
-  box_marker.color.g = 0.5;
-  box_marker.color.b = 0.5;
-  box_marker.color.a = 1.0;
-  pose_ = box_marker.pose;
-
-  control.always_visible = true;
-  control.markers.push_back(box_marker);
-  int_marker_.controls.push_back(control);
-  }
+  int_marker_.pose = pose_;
 
   {
   visualization_msgs::InteractiveMarkerControl control;
@@ -138,6 +122,7 @@ void InteractiveTf::processFeedback(
     unsigned ind,
 		const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback)
 {
+  ROS_INFO_STREAM(feedback->header.frame_id);
   pose_ = feedback->pose;
   ROS_DEBUG_STREAM(feedback->control_name);
   ROS_DEBUG_STREAM(feedback->event_type);

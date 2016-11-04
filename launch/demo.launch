@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="itf" pkg="rviz_interactive_tf" type="interactive_tf" ns="itf1">
+    <param name="parent_frame" value="map"/>
+    <param name="frame" value="tf1"/>
+  </node>
+  <node name="itf" pkg="rviz_interactive_tf" type="interactive_tf" ns="itf2">
+    <param name="parent_frame" value="tf1"/>
+    <param name="frame" value="tf2"/>
+  </node>
+  <node name="rviz" pkg="rviz" type="rviz"
+      args="-d $(find rviz_interactive_tf)/config/interactive_tf.rviz"/>
+</launch>
