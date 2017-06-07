@@ -47,7 +47,9 @@ InteractiveTf::InteractiveTf() :
   ros::param::get("~frame", frame_);
 
   int_marker_.header.frame_id = parent_frame_;
-  int_marker_.header.stamp = ros::Time::now();
+  // http://answers.ros.org/question/262866/interactive-marker-attached-to-a-moving-frame/
+  // putting a timestamp on the marker makes it not appear
+  // int_marker_.header.stamp = ros::Time::now();
 	int_marker_.name = "interactive_tf";
 	int_marker_.description = "control a tf with 6dof";
   int_marker_.pose = pose_;
