@@ -92,7 +92,6 @@ InteractiveTf::InteractiveTf() :
 	control.name = "move_y";
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 	int_marker_.controls.push_back(control);
-
   }
 
 	server_->insert(int_marker_);
