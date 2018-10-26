@@ -43,6 +43,8 @@ InteractiveTf::InteractiveTf() :
   server_.reset(new interactive_markers::InteractiveMarkerServer("interactive_tf"));
   pose_.orientation.w = 1.0;
 
+  float scale_ = 1.0;
+  ros::param::get("~scale", scale_);
   ros::param::get("~parent_frame", parent_frame_);
   ros::param::get("~frame", frame_);
 
@@ -53,6 +55,7 @@ InteractiveTf::InteractiveTf() :
 	int_marker_.name = "interactive_tf";
 	int_marker_.description = "control a tf with 6dof";
   int_marker_.pose = pose_;
+  int_marker_.scale = scale_;
 
   {
   visualization_msgs::InteractiveMarkerControl control;
