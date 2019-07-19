@@ -43,6 +43,7 @@ InteractiveTf::InteractiveTf() :
   server_.reset(new interactive_markers::InteractiveMarkerServer("interactive_tf"));
   pose_.orientation.w = 1.0;
 
+  // TODO(lucasw) need way to get parameters out- tf echo would work
   float scale_ = 1.0;
   ros::param::get("~scale", scale_);
   ros::param::get("~parent_frame", parent_frame_);
@@ -60,6 +61,8 @@ InteractiveTf::InteractiveTf() :
   {
   visualization_msgs::InteractiveMarkerControl control;
 
+  // TODO(lucasw) get roll pitch yaw and set as defaults
+
 	control.orientation.w = 1;
 	control.orientation.x = 1;
 	control.orientation.y = 0;
@@ -68,8 +71,13 @@ InteractiveTf::InteractiveTf() :
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
 	int_marker_.controls.push_back(control);
 	control.name = "move_x";
+  // TODO(lucasw) how to set initial values?
+  // double x = 0.0;
+  // ros::param::get("~x", x);
+  // control.pose.position.x = x;
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 	int_marker_.controls.push_back(control);
+  // control.pose.position.x = 0.0;
 
 	control.orientation.w = 1;
 	control.orientation.x = 0;
@@ -79,8 +87,11 @@ InteractiveTf::InteractiveTf() :
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
 	int_marker_.controls.push_back(control);
 	control.name = "move_z";
+  // double z = 0.0;
+  // control.pose.position.z = ros::param::get("~z", z);
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 	int_marker_.controls.push_back(control);
+  // control.pose.position.z = 0.0;
 
 	control.orientation.w = 1;
 	control.orientation.x = 0;
@@ -90,8 +101,11 @@ InteractiveTf::InteractiveTf() :
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
 	int_marker_.controls.push_back(control);
 	control.name = "move_y";
+  // double y = 0.0;
+  // control.pose.position.z = ros::param::get("~y", y);
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 	int_marker_.controls.push_back(control);
+  // control.pose.position.y = 0.0;
   }
 
 	server_->insert(int_marker_);
@@ -127,7 +141,7 @@ void InteractiveTf::processFeedback(
     unsigned ind,
 		const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback)
 {
-  ROS_INFO_STREAM(feedback->header.frame_id);
+  ROS_DEBUG_STREAM(feedback->header.frame_id);
   pose_ = feedback->pose;
   ROS_DEBUG_STREAM(feedback->control_name);
   ROS_DEBUG_STREAM(feedback->event_type);
