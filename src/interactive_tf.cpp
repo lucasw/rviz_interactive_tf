@@ -14,7 +14,7 @@
 #include <visualization_msgs/InteractiveMarker.h>
 
 void testFeedback(
-		const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback)
+    const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback)
 {}
 class InteractiveTf
 {
@@ -53,8 +53,8 @@ InteractiveTf::InteractiveTf() :
   // http://answers.ros.org/question/262866/interactive-marker-attached-to-a-moving-frame/
   // putting a timestamp on the marker makes it not appear
   // int_marker_.header.stamp = ros::Time::now();
-	int_marker_.name = "interactive_tf";
-	int_marker_.description = "control a tf with 6dof";
+  int_marker_.name = "interactive_tf";
+  int_marker_.description = "control a tf with 6dof";
   int_marker_.pose = pose_;
   int_marker_.scale = scale_;
 
@@ -63,56 +63,56 @@ InteractiveTf::InteractiveTf() :
 
   // TODO(lucasw) get roll pitch yaw and set as defaults
 
-	control.orientation.w = 1;
-	control.orientation.x = 1;
-	control.orientation.y = 0;
-	control.orientation.z = 0;
-	control.name = "rotate_x";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
-	int_marker_.controls.push_back(control);
-	control.name = "move_x";
+  control.orientation.w = 1;
+  control.orientation.x = 1;
+  control.orientation.y = 0;
+  control.orientation.z = 0;
+  control.name = "rotate_x";
+  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+  int_marker_.controls.push_back(control);
+  control.name = "move_x";
   // TODO(lucasw) how to set initial values?
   // double x = 0.0;
   // ros::param::get("~x", x);
   // control.pose.position.x = x;
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-	int_marker_.controls.push_back(control);
+  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+  int_marker_.controls.push_back(control);
   // control.pose.position.x = 0.0;
 
-	control.orientation.w = 1;
-	control.orientation.x = 0;
-	control.orientation.y = 1;
-	control.orientation.z = 0;
-	control.name = "rotate_z";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
-	int_marker_.controls.push_back(control);
-	control.name = "move_z";
+  control.orientation.w = 1;
+  control.orientation.x = 0;
+  control.orientation.y = 1;
+  control.orientation.z = 0;
+  control.name = "rotate_z";
+  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+  int_marker_.controls.push_back(control);
+  control.name = "move_z";
   // double z = 0.0;
   // control.pose.position.z = ros::param::get("~z", z);
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-	int_marker_.controls.push_back(control);
+  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+  int_marker_.controls.push_back(control);
   // control.pose.position.z = 0.0;
 
-	control.orientation.w = 1;
-	control.orientation.x = 0;
-	control.orientation.y = 0;
-	control.orientation.z = 1;
-	control.name = "rotate_y";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
-	int_marker_.controls.push_back(control);
-	control.name = "move_y";
+  control.orientation.w = 1;
+  control.orientation.x = 0;
+  control.orientation.y = 0;
+  control.orientation.z = 1;
+  control.name = "rotate_y";
+  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+  int_marker_.controls.push_back(control);
+  control.name = "move_y";
   // double y = 0.0;
   // control.pose.position.z = ros::param::get("~y", y);
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-	int_marker_.controls.push_back(control);
+  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+  int_marker_.controls.push_back(control);
   // control.pose.position.y = 0.0;
   }
 
-	server_->insert(int_marker_);
+  server_->insert(int_marker_);
   // Can't seem to get rid of the 0, _1 parameter
-	server_->setCallback(int_marker_.name,
+  server_->setCallback(int_marker_.name,
       boost::bind(&InteractiveTf::processFeedback, this, 0, _1));
-	// server_->setCallback(int_marker_.name, testFeedback);
+  // server_->setCallback(int_marker_.name, testFeedback);
 
   server_->applyChanges();
 
@@ -139,15 +139,15 @@ void InteractiveTf::updateTf(int, const ros::TimerEvent& event)
 
 void InteractiveTf::processFeedback(
     unsigned ind,
-		const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback)
+    const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback)
 {
   ROS_DEBUG_STREAM(feedback->header.frame_id);
   pose_ = feedback->pose;
   ROS_DEBUG_STREAM(feedback->control_name);
   ROS_DEBUG_STREAM(feedback->event_type);
   ROS_DEBUG_STREAM(feedback->mouse_point);
-	// TODO(lucasw) all the pose changes get handled by the server elsewhere?
-	server_->applyChanges();
+  // TODO(lucasw) all the pose changes get handled by the server elsewhere?
+  server_->applyChanges();
 }
 
 int main(int argc, char** argv)
