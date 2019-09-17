@@ -29,6 +29,7 @@ class DDRtoTF(object):
         self.tf_pub = rospy.Publisher('/tf', TFMessage, queue_size=4)
 
         self.config = None
+        self.stored_config = None
         self.ddr = DDynamicReconfigure("")
         self.ddr.add_variable("frame_id", "frame id", "map")
         self.ddr.add_variable("child_frame_id", "frame id", "frame")
@@ -40,10 +41,29 @@ class DDRtoTF(object):
         self.ddr.add_variable("roll", "roll", 0.0, -scale, scale)
         self.ddr.add_variable("pitch", "pitch", 0.0, -scale, scale)
         self.ddr.add_variable("yaw", "yaw", 0.0, -scale, scale)
+        self.ddr.add_variable("zero", "zero", False)
+        self.ddr.add_variable("store", "store", False)
+        self.ddr.add_variable("reset", "reset", False)
         self.ddr.start(self.config_callback)
         self.timer = rospy.Timer(rospy.Duration(0.1), self.update)
 
     def config_callback(self, config, level):
+        if self.stored_config is None:
+            self.stored_config = config
+        if config.zero:
+            config.zero = False
+            config.x = 0.0
+            config.y = 0.0
+            config.z = 0.0
+            config.roll = 0.0
+            config.pitch = 0.0
+            config.yaw = 0.0
+        if config.reset:
+            config.reset = False
+            config = self.stored_config
+        if config.store:
+            config.store = False
+            self.stored_config = config
         self.config = config
         return config
 
