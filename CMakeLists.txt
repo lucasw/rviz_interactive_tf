@@ -4,9 +4,17 @@ project(rviz_interactive_tf)
 find_package(catkin REQUIRED COMPONENTS
   interactive_markers
   roscpp
+  roslint
   visualization_msgs
   tf
 )
+
+set(
+  ROSLINT_CPP_OPTS
+  "--extensions=cpp,h,hpp" "--filter=-whitespace/braces,-runtime/references"
+)
+roslint_cpp()
+roslint_python()
 
 catkin_package(
   CATKIN_DEPENDS interactive_markers roscpp visualization_msgs tf

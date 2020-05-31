@@ -13,6 +13,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>roscpp</build_depend>
+  <build_depend>roslint</build_depend>
   <build_depend>interactive_markers</build_depend>
   <build_depend>visualization_msgs</build_depend>
   <build_depend>tf</build_depend>
