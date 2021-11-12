@@ -21,5 +21,5 @@ catkin_package(
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_executable(interactive_tf src/interactive_tf)
+add_executable(interactive_tf src/interactive_tf.cpp)
 target_link_libraries(interactive_tf ${catkin_LIBRARIES})
