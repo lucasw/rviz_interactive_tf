@@ -5,17 +5,19 @@
 # Move a tf around with dynamic reconfigure
 # Also velocity controls
 
+import copy
+
 import rospy
 import tf
-import tf2_ros
 
 from ddynamic_reconfigure_python.ddynamic_reconfigure import DDynamicReconfigure
 from geometry_msgs.msg import TransformStamped
 from tf2_msgs.msg import TFMessage
 
 
-def transform_stamped(parent, child, x=0.0, y=0.0, z=0.0, roll=0.0, pitch=0.0, yaw=0.0):
+def transform_stamped(parent, child, stamp, x=0.0, y=0.0, z=0.0, roll=0.0, pitch=0.0, yaw=0.0):
     ts = TransformStamped()
+    ts.header.stamp = stamp
     ts.header.frame_id = parent
     ts.child_frame_id = child
     ts.transform.translation.x = x
@@ -46,11 +48,15 @@ class DDRtoTF(object):
         self.ddr.add_variable("x", "x", 0.0, -scale, scale)
         self.ddr.add_variable("y", "y", 0.0, -scale, scale)
         self.ddr.add_variable("z", "z", 0.0, -scale, scale)
+        sc = 100.0
+        self.ddr.add_variable("base_x", "x above is relative to this base value", 0.0, -scale * sc, scale * sc)
+        self.ddr.add_variable("base_y", "y above is relative to this base value", 0.0, -scale * sc, scale * sc)
+        self.ddr.add_variable("base_z", "z above is relative to this base value", 0.0, -scale * sc, scale * sc)
         vel_scale = rospy.get_param("~vel_scale", 1.0)
         self.ddr.add_variable("vx", "x velocity", 0.0, -vel_scale, vel_scale)
         self.ddr.add_variable("vy", "y velocity", 0.0, -vel_scale, vel_scale)
         self.ddr.add_variable("vz", "z velocity", 0.0, -vel_scale, vel_scale)
-        self.ddr.add_variable("enable_velocity", "enable velocity", True)
+        self.ddr.add_variable("enable_velocity", "enable velocity", False)
         angle_scale = rospy.get_param("~angle_scale", 3.2)
         self.ddr.add_variable("roll", "roll", 0.0, -angle_scale, angle_scale)
         self.ddr.add_variable("pitch", "pitch", 0.0, -angle_scale, angle_scale)
@@ -58,6 +64,7 @@ class DDRtoTF(object):
         self.ddr.add_variable("zero", "zero", False)
         self.ddr.add_variable("store", "store", False)
         self.ddr.add_variable("reset", "reset", False)
+        self.ddr.add_variable("use_bound", "use bounds", False)
         self.ddr.add_variable("bound_x", "x +/- bound", scale, 0.0, scale)
         self.ddr.add_variable("bound_y", "y +/- bound", scale, 0.0, scale)
         self.ddr.add_variable("bound_z", "z +/- bound", scale, 0.0, scale)
@@ -88,6 +95,22 @@ class DDRtoTF(object):
             self.x = config.x
             self.y = config.y
             self.z = config.z
+
+        if config.enable_velocity and (self.config is None or not self.config.enable_velocity):
+            self.x = config.base_x + config.x
+            self.y = config.base_y + config.y
+            self.z = config.base_z + config.z
+
+        if self.config is not None:
+            # latch last velocity defined position
+            if self.config.enable_velocity and not config.enable_velocity:
+                config.base_x = self.x
+                config.base_y = self.y
+                config.base_z = self.z
+                config.x = 0.0
+                config.y = 0.0
+                config.z = 0.0
+
         if config.store:
             config.store = False
             self.stored_config = config
@@ -104,26 +127,31 @@ class DDRtoTF(object):
         return pos
 
     def update(self, event):
-        config = self.config
+        config = copy.deepcopy(self.config)
+
+        last = event.last_expected
+        cur = event.current_expected
 
         if config.enable_velocity:
-            if event.last_real is not None:
-                dt = (event.last_real - event.current_real).to_sec()
+            if last is not None:
+                dt = (cur - last).to_sec()
                 self.x += config.vx * dt
                 self.y += config.vy * dt
                 self.z += config.vz * dt
+        else:
+            self.x = config.base_x + config.x
+            self.y = config.base_y + config.y
+            self.z = config.base_z + config.z
+
+        if config.use_bound:
             self.x = self.clip(self.x, config.bound_x)
             self.y = self.clip(self.y, config.bound_y)
             self.z = self.clip(self.z, config.bound_z)
-        else:
-            self.x = config.x
-            self.y = config.y
-            self.z = config.z
 
-        ts = transform_stamped(config.frame_id, config.child_frame_id,
+        ts = transform_stamped(config.frame_id, config.child_frame_id, cur,
                                self.x, self.y, self.z,
                                config.roll, config.pitch, config.yaw)
-        ts.header.stamp = event.current_real
+        rospy.logdebug_throttle(1.0, f"{config.base_x:0.2f} {config.x:0.2f} -> {self.x:0.2f}")
 
         tfm = TFMessage()
         tfm.transforms.append(ts)
