@@ -5,8 +5,8 @@ find_package(catkin REQUIRED COMPONENTS
   interactive_markers
   roscpp
   roslint
-  visualization_msgs
   tf
+  visualization_msgs
 )
 
 set(
@@ -17,9 +17,33 @@ roslint_cpp()
 roslint_python()
 
 catkin_package(
-  CATKIN_DEPENDS interactive_markers roscpp visualization_msgs tf
+  CATKIN_DEPENDS
+  interactive_markers
+  roscpp
+  tf
+  visualization_msgs
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS})
 add_executable(interactive_tf src/interactive_tf.cpp)
 target_link_libraries(interactive_tf ${catkin_LIBRARIES})
+
+install(TARGETS
+  interactive_tf
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+catkin_install_python(PROGRAMS
+  scripts/ddr_tf.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY config/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
