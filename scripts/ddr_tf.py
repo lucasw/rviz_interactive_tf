@@ -69,7 +69,9 @@ class DDRtoTF(object):
         self.ddr.add_variable("bound_y", "y +/- bound", scale, 0.0, scale)
         self.ddr.add_variable("bound_z", "z +/- bound", scale, 0.0, scale)
         self.ddr.start(self.config_callback)
-        self.timer = rospy.Timer(rospy.Duration(0.033), self.update)
+        # TODO(lucasw) maybe only set reset=True when use_sim_time is true
+        # (can that be detected without using get_param("/use_sim_time")?)
+        self.timer = rospy.Timer(rospy.Duration(0.033), self.update, reset=True)
 
     def config_callback(self, config, level):
         if self.x is None:
@@ -134,6 +136,11 @@ class DDRtoTF(object):
 
         if config.enable_velocity:
             if last is not None:
+                # TODO(lucasw) this shouldn't happen unless last_expected is changed to last_real above?
+                if last > cur:
+                    rospy.logwarn(f"time jump backwards {last.to_sec():0.2f} {cur.to_sec():0.2f}"
+                                  + f"{(last - cur).to_sec():0.2f}")
+                    last = cur
                 dt = (cur - last).to_sec()
                 self.x += config.vx * dt
                 self.y += config.vy * dt
