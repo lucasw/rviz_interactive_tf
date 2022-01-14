@@ -45,6 +45,7 @@ jobs:
 
       - name: build
         run: |
+          source /opt/ros/$ROS_DISTRO/setup.bash
           cd catkin_ws
           catkin build --no-status
           source devel/setup.bash
