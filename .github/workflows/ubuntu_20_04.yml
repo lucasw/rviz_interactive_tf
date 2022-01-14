@@ -1,0 +1,57 @@
+name: Melodic 20.04 ROS CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      ROS_CI_DESKTOP: "`lsb_release -cs`"  # e.g. [trusty|xenial|...]
+      ROS_DISTRO: noetic
+    steps:
+      - name: get rviz_interactive_tf
+        uses: actions/checkout@v2
+        with:
+          path: catkin_ws/src/rviz_interactive_tf
+
+      - name: Install ROS
+        run: |
+            sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
+            sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+            sudo apt-get update -qq
+            sudo apt-get install dpkg
+            sudo apt-get install -y catkin-lint
+            sudo apt-get install -y python3-catkin-pkg
+            sudo apt-get install -y python3-catkin-tools
+            sudo apt-get install -y python3-osrf-pycommon
+            sudo apt-get install -y python3-rosdep
+            sudo apt-get install -y python3-wstool
+            sudo apt-get install -y libboost-dev
+            sudo apt-get install -y libyaml-cpp-dev
+            sudo apt-get install -y ros-cmake-modules
+            sudo apt-get install -y ros-$ROS_DISTRO-ros-base
+            source /opt/ros/$ROS_DISTRO/setup.bash
+            # Prepare rosdep to install dependencies.
+            sudo rosdep init
+            rosdep update --include-eol-distros  # Support EOL distros.
+
+      - name: Install ROS additional packages with rosdep
+        run: |
+            source /opt/ros/$ROS_DISTRO/setup.bash
+            cd catkin_ws
+            rosdep install --from-paths src --ignore-src -r -s  # do a dry-run first
+            rosdep install --from-paths src --ignore-src -r -y
+            sudo apt-get install -y ros-$ROS_DISTRO-visualization-msgs
+
+      - name: build
+        run: |
+          cd catkin_ws
+          catkin build --no-status
+          source devel/setup.bash
+
+      - name: lint
+        run: |
+          cd catkin_ws
+          catkin build $(catkin list --depends-on roslint -u) --no-status --no-deps --catkin-make-args roslint
+          LINT_CFG="-W2 --error unsorted_list --ignore uninstalled_script --error launch_depend --error description_meaningless"
+          catkin_lint src $LINT_CFG
