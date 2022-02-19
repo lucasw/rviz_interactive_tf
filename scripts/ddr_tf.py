@@ -39,6 +39,10 @@ class DDRtoTF(object):
         self.y = None
         self.z = None
 
+        self.roll = None
+        self.pitch = None
+        self.yaw = None
+
         self.config = None
         self.stored_config = None
         self.ddr = DDynamicReconfigure("")
@@ -52,11 +56,6 @@ class DDRtoTF(object):
         self.ddr.add_variable("base_x", "x above is relative to this base value", 0.0, -scale * sc, scale * sc)
         self.ddr.add_variable("base_y", "y above is relative to this base value", 0.0, -scale * sc, scale * sc)
         self.ddr.add_variable("base_z", "z above is relative to this base value", 0.0, -scale * sc, scale * sc)
-        vel_scale = rospy.get_param("~vel_scale", 1.0)
-        self.ddr.add_variable("vx", "x velocity", 0.0, -vel_scale, vel_scale)
-        self.ddr.add_variable("vy", "y velocity", 0.0, -vel_scale, vel_scale)
-        self.ddr.add_variable("vz", "z velocity", 0.0, -vel_scale, vel_scale)
-        self.ddr.add_variable("enable_velocity", "enable velocity", False)
         angle_scale = rospy.get_param("~angle_scale", 3.2)
         self.ddr.add_variable("roll", "roll", 0.0, -angle_scale, angle_scale)
         self.ddr.add_variable("pitch", "pitch", 0.0, -angle_scale, angle_scale)
@@ -64,6 +63,16 @@ class DDRtoTF(object):
         self.ddr.add_variable("zero", "zero", False)
         self.ddr.add_variable("store", "store", False)
         self.ddr.add_variable("reset", "reset", False)
+
+        vel_scale = rospy.get_param("~vel_scale", 1.0)
+        self.ddr.add_variable("vx", "x velocity", 0.0, -vel_scale, vel_scale)
+        self.ddr.add_variable("vy", "y velocity", 0.0, -vel_scale, vel_scale)
+        self.ddr.add_variable("vz", "z velocity", 0.0, -vel_scale, vel_scale)
+        self.ddr.add_variable("angular_x", "roll rate", 0.0, -vel_scale, vel_scale)
+        self.ddr.add_variable("angular_y", "pitch rate", 0.0, -vel_scale, vel_scale)
+        self.ddr.add_variable("angular_z", "yaw rate", 0.0, -vel_scale, vel_scale)
+        self.ddr.add_variable("enable_velocity", "enable velocity", False)
+
         self.ddr.add_variable("use_bound", "use bounds", False)
         self.ddr.add_variable("bound_x", "x +/- bound", scale, 0.0, scale)
         self.ddr.add_variable("bound_y", "y +/- bound", scale, 0.0, scale)
@@ -78,6 +87,9 @@ class DDRtoTF(object):
             self.x = config.x
             self.y = config.y
             self.z = config.z
+            self.roll = config.roll
+            self.pitch = config.pitch
+            self.yaw = config.yaw
         if self.stored_config is None:
             self.stored_config = config
         if config.zero:
@@ -85,23 +97,31 @@ class DDRtoTF(object):
             config.x = 0.0
             config.y = 0.0
             config.z = 0.0
-            self.x = config.x
-            self.y = config.y
-            self.z = config.z
             config.roll = 0.0
             config.pitch = 0.0
             config.yaw = 0.0
+            self.x = config.x
+            self.y = config.y
+            self.z = config.z
+            self.roll = config.roll
+            self.pitch = config.pitch
+            self.yaw = config.yaw
         if config.reset:
             config.reset = False
             config = self.stored_config
             self.x = config.x
             self.y = config.y
             self.z = config.z
-
+            self.roll = config.roll
+            self.pitch = config.pitch
+            self.yaw = config.yaw
         if config.enable_velocity and (self.config is None or not self.config.enable_velocity):
             self.x = config.base_x + config.x
             self.y = config.base_y + config.y
             self.z = config.base_z + config.z
+            self.roll = config.roll
+            self.pitch = config.pitch
+            self.yaw = config.yaw
 
         if self.config is not None:
             # latch last velocity defined position
@@ -112,6 +132,8 @@ class DDRtoTF(object):
                 config.x = 0.0
                 config.y = 0.0
                 config.z = 0.0
+
+                # TODO(lucasw) base_roll etc.?
 
         if config.store:
             config.store = False
@@ -145,6 +167,10 @@ class DDRtoTF(object):
                 self.x += config.vx * dt
                 self.y += config.vy * dt
                 self.z += config.vz * dt
+
+                self.roll += config.angular_x * dt
+                self.pitch += config.angular_y * dt
+                self.yaw += config.angular_z * dt
         else:
             self.x = config.base_x + config.x
             self.y = config.base_y + config.y
@@ -157,7 +183,7 @@ class DDRtoTF(object):
 
         ts = transform_stamped(config.frame_id, config.child_frame_id, cur,
                                self.x, self.y, self.z,
-                               config.roll, config.pitch, config.yaw)
+                               self.roll, self.pitch, self.yaw)
         rospy.logdebug_throttle(1.0, f"{config.base_x:0.2f} {config.x:0.2f} -> {self.x:0.2f}")
 
         tfm = TFMessage()
