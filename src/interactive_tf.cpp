@@ -5,7 +5,6 @@
  * drag it around and rotate it with interactive marker controls.
  */
 
-#include <boost/bind.hpp>
 #include <geometry_msgs/Pose.h>
 #include <interactive_markers/interactive_marker_server.h>
 #include <ros/ros.h>
@@ -109,15 +108,14 @@ InteractiveTf::InteractiveTf() :
   }
 
   server_->insert(int_marker_);
-  // Can't seem to get rid of the 0, _1 parameter
   server_->setCallback(int_marker_.name,
-      boost::bind(&InteractiveTf::processFeedback, this, 0, _1));
+      boost::bind(&InteractiveTf::processFeedback, this, 0, boost::placeholders::_1));
   // server_->setCallback(int_marker_.name, testFeedback);
 
   server_->applyChanges();
 
   tf_timer_ = nh_.createTimer(ros::Duration(0.05),
-      boost::bind(&InteractiveTf::updateTf, this, 0, _1));
+      boost::bind(&InteractiveTf::updateTf, this, 0, boost::placeholders::_1));
 }
 
 InteractiveTf::~InteractiveTf()
