@@ -167,16 +167,21 @@ class DDRtoTF(object):
                 # TODO(lucasw) this shouldn't happen unless last_expected is changed to last_real above?
                 if last > cur:
                     rospy.logwarn(f"time jump backwards {last.to_sec():0.2f} {cur.to_sec():0.2f}"
-                                  + f"{(last - cur).to_sec():0.2f}")
+                                  + f", delta {(last - cur).to_sec():0.2f}")
                     last = cur
-                dt = (cur - last).to_sec()
-                self.x += config.vx * dt
-                self.y += config.vy * dt
-                self.z += config.vz * dt
+                    return
+                elif last == cur:
+                    rospy.logwarn(f"time didn't advance {last.to_sec():0.2f} {cur.to_sec():0.2f}")
+                    return
+                else:
+                    dt = (cur - last).to_sec()
+                    self.x += config.vx * dt
+                    self.y += config.vy * dt
+                    self.z += config.vz * dt
 
-                self.roll += config.angular_x * dt
-                self.pitch += config.angular_y * dt
-                self.yaw += config.angular_z * dt
+                    self.roll += config.angular_x * dt
+                    self.pitch += config.angular_y * dt
+                    self.yaw += config.angular_z * dt
         else:
             self.x = config.base_x + config.x
             self.y = config.base_y + config.y
