@@ -77,6 +77,8 @@ class DDRtoTF(object):
         self.ddr.add_variable("bound_x", "x +/- bound", scale, 0.0, scale)
         self.ddr.add_variable("bound_y", "y +/- bound", scale, 0.0, scale)
         self.ddr.add_variable("bound_z", "z +/- bound", scale, 0.0, scale)
+
+        self.ddr.add_variable("use_expected_time", "use expected time, may not work well with sim time", False)
         self.ddr.start(self.config_callback)
         # TODO(lucasw) maybe only set reset=True when use_sim_time is true
         # (can that be detected without using get_param("/use_sim_time")?)
@@ -153,8 +155,12 @@ class DDRtoTF(object):
     def update(self, event):
         config = copy.deepcopy(self.config)
 
-        last = event.last_expected
-        cur = event.current_expected
+        if config.use_expected_time:
+            last = event.last_expected
+            cur = event.current_expected
+        else:
+            last = event.last_real
+            cur = event.current_real
 
         if config.enable_velocity:
             if last is not None:
