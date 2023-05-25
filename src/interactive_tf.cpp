@@ -40,13 +40,19 @@ InteractiveTf::InteractiveTf() :
   frame_("interactive_tf")
 {
   server_.reset(new interactive_markers::InteractiveMarkerServer("interactive_tf"));
-  pose_.orientation.w = 1.0;
 
   // TODO(lucasw) need way to get parameters out- tf echo would work
   float scale_ = 1.0;
-  ros::param::get("~scale", scale_);
-  ros::param::get("~parent_frame", parent_frame_);
-  ros::param::get("~frame", frame_);
+  ros::param::param<float>("~scale", scale_, 1.0);
+  ros::param::param<std::string>("~parent_frame", parent_frame_, "world");
+  ros::param::param<std::string>("~frame", frame_, "interactive_tf");
+  ros::param::param<double>("~initial_pos_x", pose_.position.x, 0.0);
+  ros::param::param<double>("~initial_pos_y", pose_.position.y, 0.0);
+  ros::param::param<double>("~initial_pos_z", pose_.position.z, 0.0);
+  ros::param::param<double>("~initial_rot_x", pose_.orientation.x, 0.0);
+  ros::param::param<double>("~initial_rot_y", pose_.orientation.y, 0.0);
+  ros::param::param<double>("~initial_rot_z", pose_.orientation.z, 0.0);
+  ros::param::param<double>("~initial_rot_w", pose_.orientation.w, 1.0);
 
   int_marker_.header.frame_id = parent_frame_;
   // http://answers.ros.org/question/262866/interactive-marker-attached-to-a-moving-frame/
@@ -61,7 +67,8 @@ InteractiveTf::InteractiveTf() :
   visualization_msgs::InteractiveMarkerControl control;
 
   // TODO(lucasw) get roll pitch yaw and set as defaults
-
+  
+  control.orientation_mode = visualization_msgs::InteractiveMarkerControl::FIXED;
   control.orientation.w = 1;
   control.orientation.x = 1;
   control.orientation.y = 0;
