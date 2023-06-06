@@ -60,6 +60,7 @@ class DDRtoTF(object):
         self.ddr.add_variable("roll", "roll", 0.0, -angle_scale, angle_scale)
         self.ddr.add_variable("pitch", "pitch", 0.0, -angle_scale, angle_scale)
         self.ddr.add_variable("yaw", "yaw", 0.0, -angle_scale, angle_scale)
+        self.ddr.add_variable("enable_live_rpy", "update rpy live, doesn't work with velocity mode", True)
         self.ddr.add_variable("zero", "zero", False)
         self.ddr.add_variable("store", "store", False)
         self.ddr.add_variable("reset", "reset", False)
@@ -121,6 +122,13 @@ class DDRtoTF(object):
             self.x = config.base_x + config.x
             self.y = config.base_y + config.y
             self.z = config.base_z + config.z
+            self.roll = config.roll
+            self.pitch = config.pitch
+            self.yaw = config.yaw
+        if config.enable_velocity and config.enable_live_rpy:
+            rospy.logwarn("disabling live rpy in favor of velocity mode")
+            config.enable_live_rpy = False
+        if config.enable_live_rpy:
             self.roll = config.roll
             self.pitch = config.pitch
             self.yaw = config.yaw
