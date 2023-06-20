@@ -10,6 +10,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <tf/transform_broadcaster.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 #include <visualization_msgs/InteractiveMarker.h>
 
 void testFeedback(
@@ -25,6 +26,7 @@ class InteractiveTf
 
   geometry_msgs::Pose pose_;
   tf::TransformBroadcaster br_;
+  tf2_ros::StaticTransformBroadcaster static_br_;
   std::string parent_frame_;
   std::string frame_;
   void updateTf(int, const ros::TimerEvent& event);
@@ -132,14 +134,26 @@ InteractiveTf::~InteractiveTf()
 
 void InteractiveTf::updateTf(int, const ros::TimerEvent& event)
 {
-  tf::Transform transform;
-  transform.setOrigin(tf::Vector3(pose_.position.x, pose_.position.y, pose_.position.z));
-  transform.setRotation(tf::Quaternion(pose_.orientation.x,
-      pose_.orientation.y,
-      pose_.orientation.z,
-      pose_.orientation.w));
-  br_.sendTransform(tf::StampedTransform(transform, ros::Time::now(),
-      parent_frame_, frame_));
+  // tf::Transform transform;
+  // transform.setOrigin(tf::Vector3(pose_.position.x, pose_.position.y, pose_.position.z));
+  // transform.setRotation(tf::Quaternion(pose_.orientation.x,
+  //     pose_.orientation.y,
+  //     pose_.orientation.z,
+  //     pose_.orientation.w));
+  // br_.sendTransform(tf::StampedTransform(transform, ros::Time::now(),
+  //     parent_frame_, frame_));
+  geometry_msgs::TransformStamped transform_msg;
+  transform_msg.child_frame_id = frame_;
+  transform_msg.header.frame_id = parent_frame_;
+  transform_msg.header.stamp = ros::Time::now();
+  transform_msg.transform.translation.x = pose_.position.x;
+  transform_msg.transform.translation.y = pose_.position.y;
+  transform_msg.transform.translation.z = pose_.position.z;
+  transform_msg.transform.rotation.x = pose_.orientation.x;
+  transform_msg.transform.rotation.y = pose_.orientation.y;
+  transform_msg.transform.rotation.z = pose_.orientation.z;
+  transform_msg.transform.rotation.w = pose_.orientation.w;
+  static_br_.sendTransform(transform_msg);
 }
 
 void InteractiveTf::processFeedback(
