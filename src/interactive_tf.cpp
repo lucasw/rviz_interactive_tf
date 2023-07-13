@@ -111,11 +111,38 @@ InteractiveTf::InteractiveTf() :
   server_->setCallback(int_marker_.name,
       boost::bind(&InteractiveTf::processFeedback, this, 0, boost::placeholders::_1));
   // server_->setCallback(int_marker_.name, testFeedback);
-
   server_->applyChanges();
 
   tf_timer_ = nh_.createTimer(ros::Duration(0.05),
       boost::bind(&InteractiveTf::updateTf, this, 0, boost::placeholders::_1));
+
+  // *** (hoshianaaa) initial pose setting ***
+
+  double x = 0.0;
+  ros::param::get("~x", x);
+  double y = 0.0;
+  ros::param::get("~y", y);
+  double z = 0.0;
+  ros::param::get("~z", z);
+  double ox = 0.0;
+  ros::param::get("~ox", ox);
+  double oy = 0.0;
+  ros::param::get("~oy", oy);
+  double oz = 0.0;
+  ros::param::get("~oz", oz);
+  double ow = 1.0;
+  ros::param::get("~ow", ow);
+
+  pose_.position.x = x;
+  pose_.position.y = y;
+  pose_.position.z = z;
+  pose_.orientation.x = ox;
+  pose_.orientation.y = oy;
+  pose_.orientation.z = oz;
+  pose_.orientation.w = ow;
+  server_->setPose(int_marker_.name, pose_, int_marker_.header);
+  server_->applyChanges();
+
 }
 
 InteractiveTf::~InteractiveTf()
