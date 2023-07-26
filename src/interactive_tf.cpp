@@ -142,7 +142,6 @@ InteractiveTf::InteractiveTf() :
 
   server_->setPose(int_marker_.name, pose_, int_marker_.header);
   server_->applyChanges();
-
 }
 
 InteractiveTf::~InteractiveTf()
