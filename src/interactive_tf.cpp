@@ -10,6 +10,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <tf/transform_broadcaster.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <visualization_msgs/InteractiveMarker.h>
 
 void testFeedback(
@@ -116,30 +117,29 @@ InteractiveTf::InteractiveTf() :
   tf_timer_ = nh_.createTimer(ros::Duration(0.05),
       boost::bind(&InteractiveTf::updateTf, this, 0, boost::placeholders::_1));
 
-  // *** (hoshianaaa) initial pose setting ***
-
+  // initial pose setting
   double x = 0.0;
   ros::param::get("~x", x);
   double y = 0.0;
   ros::param::get("~y", y);
   double z = 0.0;
   ros::param::get("~z", z);
-  double ox = 0.0;
-  ros::param::get("~ox", ox);
-  double oy = 0.0;
-  ros::param::get("~oy", oy);
-  double oz = 0.0;
-  ros::param::get("~oz", oz);
-  double ow = 1.0;
-  ros::param::get("~ow", ow);
 
   pose_.position.x = x;
   pose_.position.y = y;
   pose_.position.z = z;
-  pose_.orientation.x = ox;
-  pose_.orientation.y = oy;
-  pose_.orientation.z = oz;
-  pose_.orientation.w = ow;
+
+  double roll = 0.0;
+  ros::param::get("~roll", roll);
+  double pitch = 0.0;
+  ros::param::get("~pitch", pitch);
+  double yaw = 0.0;
+  ros::param::get("~yaw", yaw);
+
+  tf2::Quaternion quat;
+  quat.setRPY(roll, pitch, yaw);
+  pose_.orientation = tf2::toMsg(quat);
+
   server_->setPose(int_marker_.name, pose_, int_marker_.header);
   server_->applyChanges();
 

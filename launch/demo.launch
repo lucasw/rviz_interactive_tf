@@ -4,15 +4,12 @@
     <param name="parent_frame" value="map"/>
     <param name="frame" value="tf1"/>
     <!-- set initial value -->
-    <!--
     <param name="x" value="3.0"/>
     <param name="y" value="1.0"/>
     <param name="z" value="0.0"/>
-    <param name="ox" value="0.0"/>
-    <param name="oy" value="0.0"/>
-    <param name="oz" value="0.383"/>
-    <param name="ow" value="0.924"/>
-    -->
+    <param name="roll" value="0.0"/>
+    <param name="pitch" value="0.3"/>
+    <param name="yaw" value="0.0"/>
   </node>
   <!-- when these are chained together, the marker controls don't
       appear unless I switch rviz to the tf1 frame, then move tf2,
