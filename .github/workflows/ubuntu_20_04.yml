@@ -1,4 +1,4 @@
-name: Melodic 20.04 ROS CI
+name: Noetic 20.04 ROS CI
 
 on: [push]
 
