@@ -41,7 +41,7 @@ InteractiveTf::InteractiveTf() :
   parent_frame_("map"),
   frame_("interactive_tf")
 {
-  server_.reset(new interactive_markers::InteractiveMarkerServer("interactive_tf"));
+  server_.reset(new interactive_markers::InteractiveMarkerServer(ros::this_node::getName()));
 
   // TODO(lucasw) need way to get parameters out- tf echo would work
   float scale_ = 1.0;
