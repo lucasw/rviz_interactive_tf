@@ -134,14 +134,6 @@ InteractiveTf::~InteractiveTf()
 
 void InteractiveTf::updateTf(int, const ros::TimerEvent& event)
 {
-  // tf::Transform transform;
-  // transform.setOrigin(tf::Vector3(pose_.position.x, pose_.position.y, pose_.position.z));
-  // transform.setRotation(tf::Quaternion(pose_.orientation.x,
-  //     pose_.orientation.y,
-  //     pose_.orientation.z,
-  //     pose_.orientation.w));
-  // br_.sendTransform(tf::StampedTransform(transform, ros::Time::now(),
-  //     parent_frame_, frame_));
   geometry_msgs::TransformStamped transform_msg;
   transform_msg.child_frame_id = frame_;
   transform_msg.header.frame_id = parent_frame_;
