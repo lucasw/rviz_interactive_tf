@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   roslint
   tf
+  tf2_geometry_msgs
   tf2_ros
   visualization_msgs
 )
