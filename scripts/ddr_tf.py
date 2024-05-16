@@ -170,6 +170,11 @@ class DDRtoTF(object):
             last = event.last_real
             cur = event.current_real
 
+        if cur == last:
+            # TODO(lucasw) not sure why this happens, but it does- maybe only with bag playback?
+            rospy.logwarn_throttle(8.0, "duplicate stamps")
+            return
+
         if config.enable_velocity:
             if last is not None:
                 # TODO(lucasw) this shouldn't happen unless last_expected is changed to last_real above?
