@@ -12,6 +12,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>ddynamic_reconfigure</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>roslint</build_depend>
   <build_depend>interactive_markers</build_depend>

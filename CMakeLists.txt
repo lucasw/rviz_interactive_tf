@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(rviz_interactive_tf)
 
 find_package(catkin REQUIRED COMPONENTS
+  ddynamic_reconfigure
   interactive_markers
   roscpp
   roslint
@@ -28,10 +29,15 @@ catkin_package(
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
+
+add_executable(ddr_tf src/ddr_tf.cpp)
+target_link_libraries(ddr_tf ${catkin_LIBRARIES})
+
 add_executable(interactive_tf src/interactive_tf.cpp)
 target_link_libraries(interactive_tf ${catkin_LIBRARIES})
 
 install(TARGETS
+  ddr_tf
   interactive_tf
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
